@@ -1,4 +1,4 @@
-local targetName = "ArtzGeming" 
+local targetName = "" 
 
 print("Waiting game loaded..")
 
