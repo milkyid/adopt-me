@@ -1,1 +1,1 @@
-learning scripting roblox, w my stupidness
+learning roblox scripting, w my stupidness.
