@@ -1,24 +1,20 @@
-local targetName = "ArtzGeming" 
+local targetName = "" 
 
 print("Waiting game loaded..")
 
-repeat
-    task.wait()
-until
-    game:IsLoaded()
+repeat task.wait() until game:IsLoaded()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 print("Waiting asset loaded..") 
 
-repeat 
-    task.wait(0.5) 
-until 
-    PlayerGui.AssetLoadUI.Enabled == false and LocalPlayer:GetAttribute("file_load_status_debug") == "Done"
+repeat task.wait(0.5) until PlayerGui.AssetLoadUI.Enabled == false and LocalPlayer:GetAttribute("file_load_status_debug") == "Done"
 
 local Fsys = require(ReplicatedStorage:WaitForChild("Fsys"))
 
@@ -28,10 +24,9 @@ local  function ModuleLoader(name)
     repeat
         task.wait()
     until typeof(cache[name]) == 'table'
-
     return cache[name]
-
 end
+
 local RouterClient = ModuleLoader("RouterClient")
 local UIManager = ModuleLoader("UIManager")
 local InteriorsM = ModuleLoader("InteriorsM")
@@ -66,6 +61,58 @@ end
 
 local function FormatNumber(n)
     return tostring(n):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
+end
+
+local function OptimizeGraphics()
+
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+    Lighting.Brightness = 0
+    
+    for _, v in pairs(Lighting:GetChildren()) do
+        if v:IsA("PostEffect") or v:IsA("Sky") or v:IsA("Atmosphere") then
+            v:Destroy()
+        end
+    end
+
+    local function ClearObject(v)
+        if v:IsA("BasePart") and not v:IsA("MeshPart") then
+            v.Material = Enum.Material.Plastic
+            v.Reflectance = 0
+            v.CastShadow = false
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v:Destroy()
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
+            v.Enabled = false
+        elseif v:IsA("MeshPart") then
+            v.Material = Enum.Material.Plastic
+            v.Reflectance = 0
+            v.TextureID = "" 
+            v.CastShadow = false
+        elseif v:IsA("SpecialMesh") then
+            v.TextureId = ""
+        end
+    end
+
+    for _, v in pairs(workspace:GetDescendants()) do
+        ClearObject(v)
+    end
+    
+    workspace.DescendantAdded:Connect(function(v)
+        task.wait()
+        ClearObject(v)
+    end)
+    
+    pcall(function()
+        settings().Rendering.QualityLevel = 1
+        settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level04
+    end)
+    
+    if workspace:WaitForChild("ChristmasSnow") then
+        workspace.ChristmasSnow:Destroy()
+    end
+
+    RunService:Set3dRenderingEnabled(false)
 end
 
 local Remotes = Dehasher()
@@ -121,6 +168,7 @@ task.spawn(function()
             end
         end
     end
+    task.spawn(OptimizeGraphics)
 end)
 
 -- some gpt shit
@@ -143,10 +191,6 @@ task.spawn(function()
     MainFrame.AnchorPoint = Vector2.new(0.5, 0)
     MainFrame.Size = UDim2.new(0.3, 0, 0.12, 0) 
     MainFrame.Parent = ScreenGui
-
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0.2, 0)
-    UICorner.Parent = MainFrame
 
     local UIStroke = Instance.new("UIStroke")
     UIStroke.Color = Color3.fromRGB(255, 255, 255)
