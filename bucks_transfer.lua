@@ -1,4 +1,4 @@
-local targetName = "" 
+local targetName = "ArtzGeming" 
 
 print("Waiting game loaded..")
 
@@ -82,9 +82,9 @@ if not LocalPlayer.Character then
     end
 end
 
-LocalPlayer.Idled:Connect(function()
-    VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new())
+task.spawn(function() -- cr to hassan :D
+    task.wait(5)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hassanxzayn-lua/Anti-afk/main/antiafkbyhassanxzyn"))();
 end)
 
 task.spawn(function()
@@ -110,6 +110,7 @@ task.spawn(function()
 end)
 
 task.spawn(function()
+    task.wait(10)
     for _, v in pairs(PlayerGui:GetChildren()) do
         if v:IsA("ScreenGui") then
             if UIManager.is_visible(v.name) then
